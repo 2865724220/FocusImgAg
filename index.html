@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>AngularJs-焦点图</title>
+	<script type="text/javascript" src="js/angular.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/index.css">
+</head>
+<body ng-app="focusApp">
+		<div class="container" ng-controller="focusCtrl">
+			<div lunbo></div>
+			<script type="text/ng-template" id="lunbo.html">
+				<ul class="banner">
+					<li ng-repeat="img in images" class="">
+						<a href="{{img.href}}" target="_blank">
+							<img src="{{img.src}}" />
+						</a>
+					</li>
+				</ul>
+			</script>
+		</div>	
+</body>
+</html>
+<script type="text/javascript">
+	var focusApp = angular.module('focusApp', []);
+	focusApp.controller('focusCtrl', ['$scope','readJSON', function($scope,readJSON){
+		
+	}]);
+	focusApp.factory('readJSON', ['$http','$q', function($http,$q){
+		return {
+			query:function(){
+				var deferred = $q.defer();
+				$http({
+					method:'GET',
+					url:'img.json'
+				}).success(function(data,status,header,config){
+					deferred.resolve(data);
+				}).error(function(data,status,header,config){
+					deferred.reject(data);
+				});
+				return deferred.promise;
+			}
+			
+		}
+	}]);
+	focusApp.directive('lunbo', ['readJSON', function(readJSON){
+		// Runs during compile
+		return {
+			
+			restrict: 'A', // E = Element, A = Attribute, C = Class, M = Comment
+			templateUrl: 'lunbo.html',
+			scope:{},
+			link: function(scope,element,attr) {
+				var promise = readJSON.query();
+				var step = 0;
+				scope.flag = false;
+				promise.then(function(data){				
+					scope.images = data;
+					console.log(scope.images);
+				});
+
+				setInterval(function(){
+					element.find("li").css({"display":"none","opacity":"0"});
+					element.find("li").removeClass("active");
+					step++;
+					step = step%5;
+					element.find("li").eq(step).css({"display":"block","opacity":"1"});
+					element.find("li").eq(step).addClass("active");
+				},1000)
+				
+			}
+		};
+	}]);
+
+</script>
