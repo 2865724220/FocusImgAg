@@ -16,3 +16,9 @@
 	overflow: hidden;
 	position: relative;
 }
+.banner li{
+	display:none;
+}
+.banner li:first-child{
+	display:block;
+}
